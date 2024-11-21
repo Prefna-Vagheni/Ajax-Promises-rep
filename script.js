@@ -335,7 +335,7 @@ btn.addEventListener('click', whereAmI);
 
 /////////////////////////////////////////
 // Coding challenge #2
-let currentImg;
+/*let currentImg;
 const wait = function (seconds) {
   return new Promise(function (resolve) {
     setTimeout(resolve, seconds * 1000);
@@ -381,3 +381,77 @@ createImage('img/img-1.jpg')
   })
   .then(() => (currentImg.style.display = 'none'))
   .catch(err => console.error(err));
+*/
+
+// prettier-ignore
+const countryNameMap = {
+  'Zaire': 'drc',
+};
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function (country) {
+  try {
+    // Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
+
+    //Reverse geocoding
+    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    if (!resGeo.ok) throw new Error('Problem getting location data');
+
+    const dataGeo = await resGeo.json();
+    const alt = dataGeo.country === 'Zaire' ? 'drc' : dataGeo.country;
+
+    console.log(alt);
+    console.log(dataGeo);
+    //   fetch(`https://restcountries.com/v2/name/${country}`).then(res =>console.log(res));
+
+    //Country data
+    const res = await fetch(`https://restcountries.com/v2/name/${alt}`);
+    if (!res.ok) throw new Error(`Country not found. ${res.status}`);
+
+    const data = await res.json();
+    console.log(data);
+    renderCountry(data[0]);
+  } catch (err) {
+    console.error(err);
+    renderError(`Something went wrong: ${err.message}😥😥`);
+  }
+};
+whereAmI();
+
+// console.log('first');
+
+// Understanding async/await vs fetch/then
+const exercise = async function (country) {
+  const res = await fetch(`https://restcountries.com/v2/name/${country}`);
+  const data = await res.json();
+  console.log(data);
+};
+
+const experiment = function (country) {
+  fetch(`https://restcountries.com/v2/name/${country}`)
+    .then(res => res.json())
+    .then(data => console.log(data));
+};
+
+// exercise('spain');
+// experiment('spain');
+
+// fetch('https://www.apicountries.com/countries')
+//   .then(res => res.json())
+//   .then(res => console.log(res));
+// fetch(`https://example.com/countries/uganda`)
+//   .then(res => res.json())
+//   .then(data => console.log(data));
+
+// fetch('https://restcountries.com/v3.1/all')
+//   .then(res => res.json())
+//   .then(data => console.log(data));
+// fetch('https://restcountries.com/v3.1/name/drc')
+//   .then(res => res.json())
+//   .then(data => console.log(data[0]));

@@ -641,4 +641,108 @@ const loadAll = async function (imgArr) {
     console.error(err);
   }
 };
-loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
+// loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
+
+// EXERCISES TO WRAP UP WITH THIS SECTION
+
+function fetchPokemon() {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      // resolve({ data: { name: 'Pickachu', power: 20 } });
+      reject(new Error('Danger, danger'));
+    }, 2000);
+  });
+}
+// console.log('Program starting...');
+
+async function asyncFunction() {
+  try {
+    const { data } = await fetchPokemon();
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+  console.log('There was an error but we are good.');
+}
+// asyncFunction();
+
+const fetchUser = function () {
+  return new Promise((resolve, reject) => {
+    setTimeout(function () {
+      resolve({ data: { user: 'Monkey', admin: true } });
+    }, 3000);
+  });
+};
+
+const login = function (arg) {
+  if (arg.hasOwnProperty('admin')) resolve('Successfully logged in!');
+  else reject(new Error('Failed to log in, pleasee try again.'));
+};
+
+// (async function () {
+//   const data = await fetchUser();
+//   console.log(data);
+// })();
+
+//1
+function invokeDelay(callback) {
+  setTimeout(callback, 2000);
+}
+
+function displayMessage() {
+  console.log('I took some delay.');
+}
+// invokeDelay(displayMessage);
+
+//2
+function convertCallBack(prom) {
+  return new Promise.resolve(prom).then(resp => console.log(resp));
+}
+
+//3
+const fnRequest = function (url) {
+  return new Promise((resolve, reject) => {
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error. Status: ${res.status}`);
+
+        return res.json();
+      })
+      .then(data => resolve(data))
+      .catch(err => reject(err));
+  });
+};
+// fnRequest('uweurjwfjja.com')
+//   .then(data => console.log('Response data' + data))
+//   .catch(error => console.error('Error: ' + error.message));
+
+const arrFunction = function (urls) {
+  const aSet = urls.map(url => {
+    return new Promise(function (resolve, reject) {
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP failed to fetch. ${res.status}`);
+
+          return res.text();
+        })
+        .then(data => resolve(data))
+        .catch(err => reject(err));
+    });
+  });
+
+  return Promise.all(aSet);
+};
+const urls = [
+  'https://jsonplaceholder.typicode.com/posts/2',
+  'https://jsonplaceholder.typicode.com/posts/1',
+  'https://jsonplaceholder.typicode.com/posts/3',
+];
+arrFunction(urls)
+  .then(content => console.log('Download contents: ' + content))
+  .catch(err => console.error(err.message));
+
+const series = async function (url) {
+  const res = await fetch(url);
+  const data = await res.json();
+  console.log(data);
+};

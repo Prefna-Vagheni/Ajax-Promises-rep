@@ -746,3 +746,64 @@ const series = async function (url) {
   const data = await res.json();
   console.log(data);
 };
+
+// 6
+const fetchData = function (url) {
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`HTTP failed: ${response.status}`);
+
+    return response.json();
+  });
+};
+
+const multipleAPIs = function (urls) {
+  const promise = urls.map(url => fetchData(url));
+
+  return Promise.all([promise]);
+};
+
+const maxRetries = function (url, maxRetries) {
+  return new Promise(function (resolve, reject) {
+    let retries = 0;
+    const fetchData = () => {
+      fetch(url)
+        .then(response => {
+          if (!response.ok)
+            throw new Error(`HTTP failed. (Status: ${response.status}) `);
+
+          return response.json();
+        })
+        .then(data => resolve(data))
+        .catch(err => {
+          retries++;
+          if (retries <= maxRetries) {
+            console.log(
+              `It failed but we are trying to fetch again. ${retries} retr${
+                retries === 1 ? 'y' : 'ies'
+              } / ${maxRetries} chances`
+            );
+
+            fetchData();
+          } else {
+            reject(
+              new Error(
+                `Still failed after many attemps. Error: ${err.message}`
+              )
+            );
+          }
+        });
+    };
+
+    fetchData();
+  });
+};
+
+const apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+const max = 3;
+console.log('URL =>', apiUrl);
+
+maxRetries(apiUrl, max)
+  .then(res => console.log('Fetched data', res))
+  .catch(error => console.log(`Error: `, error.message));
+
+const fetchingFunction = function (url) {};
